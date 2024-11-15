@@ -1,15 +1,21 @@
-"use client";
-import { usePathname } from "next/navigation";
 import Image from "next/image";
 import { peliculas } from "@/data";
 
-export default function Page() {
-	const pathname = usePathname();
-	const id = pathname.split("/").pop();
+export async function generateStaticParams() {
+	return peliculas.map((p) => ({
+		id: p.id.toString(),
+	}));
+}
 
-	const pelicula = peliculas.find(
-		(p) => p.id === Number.parseInt(id as string),
-	);
+interface PageProps {
+	params: Promise<{ id: string }>;
+}
+
+export default async function Page(props: PageProps) {
+	const params = await props.params;
+	const id = params.id;
+
+	const pelicula = peliculas.find((p) => p.id === Number.parseInt(id));
 
 	if (!pelicula) {
 		return <p>Película no encontrada</p>;
